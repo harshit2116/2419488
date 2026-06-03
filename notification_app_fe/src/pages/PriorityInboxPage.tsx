@@ -23,6 +23,9 @@ function PriorityInboxPage() {
   const [notifications, setNotifications] =
     useState<any[]>([]);
 
+  const [readNotifications, setReadNotifications] =
+    useState<string[]>([]);
+
   const [filter, setFilter] =
     useState("All");
 
@@ -57,6 +60,17 @@ function PriorityInboxPage() {
     loadNotifications();
   }, []);
 
+  useEffect(() => {
+    const saved =
+      localStorage.getItem("readNotifications");
+
+    if (saved) {
+      setReadNotifications(
+        JSON.parse(saved)
+      );
+    }
+  }, []);
+
   const filteredNotifications =
     filter === "All"
       ? notifications
@@ -76,6 +90,25 @@ function PriorityInboxPage() {
       (page - 1) * itemsPerPage,
       page * itemsPerPage
     );
+
+  function markAsRead(id: string) {
+    if (
+      readNotifications.includes(id)
+    )
+      return;
+
+    const updated = [
+      ...readNotifications,
+      id,
+    ];
+
+    setReadNotifications(updated);
+
+    localStorage.setItem(
+      "readNotifications",
+      JSON.stringify(updated)
+    );
+  }
 
   return (
     <>
@@ -159,6 +192,20 @@ function PriorityInboxPage() {
                     key={
                       notification.ID
                     }
+                    onClick={() =>
+                      markAsRead(
+                        notification.ID
+                      )
+                    }
+                    sx={{
+                      cursor: "pointer",
+                      backgroundColor:
+                        readNotifications.includes(
+                          notification.ID
+                        )
+                          ? "#f3f4f6"
+                          : "#ffffff",
+                    }}
                   >
                     <CardContent>
                       <Typography variant="h6">
@@ -171,6 +218,25 @@ function PriorityInboxPage() {
                         {
                           notification.Message
                         }
+                      </Typography>
+
+                      <Typography
+                        sx={{
+                          mt: 1,
+                          fontWeight: 600,
+                          color:
+                            readNotifications.includes(
+                              notification.ID
+                            )
+                              ? "#6b7280"
+                              : "#16a34a",
+                        }}
+                      >
+                        {readNotifications.includes(
+                          notification.ID
+                        )
+                          ? "Read"
+                          : "Unread"}
                       </Typography>
 
                       <Typography
