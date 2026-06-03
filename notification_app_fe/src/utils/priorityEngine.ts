@@ -3,6 +3,7 @@ type Notification = {
   Type: string;
   Message: string;
   Timestamp: string;
+  read?: boolean;
 };
 
 const PRIORITY: Record<string, number> = {
@@ -17,12 +18,17 @@ export function getTopNotifications(
 ) {
   return [...notifications]
     .sort((a, b) => {
+      if (!!a.read !== !!b.read) {
+        return a.read ? 1 : -1;
+      }
+
       const priorityDiff =
         PRIORITY[b.Type] -
         PRIORITY[a.Type];
 
-      if (priorityDiff !== 0)
+      if (priorityDiff !== 0) {
         return priorityDiff;
+      }
 
       return (
         new Date(b.Timestamp).getTime() -
