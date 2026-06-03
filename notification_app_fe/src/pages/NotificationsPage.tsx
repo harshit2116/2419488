@@ -9,6 +9,10 @@ import {
   CardContent,
   Stack,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { fetchNotifications } from "../services/notificationService";
@@ -16,6 +20,8 @@ import { fetchNotifications } from "../services/notificationService";
 function NotificationsPage() {
   const [notifications, setNotifications] =
     useState<any[]>([]);
+
+  const [filter, setFilter] = useState("All");
   const [loading, setLoading] =
     useState(true);
 
@@ -38,8 +44,13 @@ function NotificationsPage() {
     loadNotifications();
   }, []);
 
-  console.log("Notifications State:");
-    console.log(notifications);
+  const filteredNotifications =
+  filter === "All"
+    ? notifications
+    : notifications.filter(
+        (notification) =>
+          notification.Type === filter
+      );
   return (
     <>
       <AppBar position="static" sx={{backgroundColor: "#7c3aed"}}>
@@ -63,17 +74,52 @@ function NotificationsPage() {
 
       <Container sx={{ mt: 4 }}>
         <Typography
-          variant="h4"
-          gutterBottom
-        >
-          All Notifications
-        </Typography>
+  variant="h4"
+  gutterBottom
+>
+  All Notifications
+</Typography>
+
+<FormControl
+  fullWidth
+  sx={{ mb: 3 }}
+>
+  <InputLabel>
+    Notification Type
+  </InputLabel>
+
+  <Select
+    value={filter}
+    label="Notification Type"
+    onChange={(e) =>
+      setFilter(
+        e.target.value
+      )
+    }
+  >
+    <MenuItem value="All">
+      All
+    </MenuItem>
+
+    <MenuItem value="Placement">
+      Placement
+    </MenuItem>
+
+    <MenuItem value="Result">
+      Result
+    </MenuItem>
+
+    <MenuItem value="Event">
+      Event
+    </MenuItem>
+  </Select>
+</FormControl>
 
         {loading ? (
           <CircularProgress />
         ) : (
           <Stack spacing={2}>
-            {notifications.map(
+            {filteredNotifications.map(
               (notification) => (
                 <Card
                   key={notification.ID}
